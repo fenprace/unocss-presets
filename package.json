@@ -1,0 +1,30 @@
+{
+  "name": "@skand/unocss-presets",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "login": "aws codeartifact login --region ap-southeast-2 --tool npm --domain skand --repository core --namespace @skand",
+    "prepare": "husky install",
+    "prepublishOnly": "pnpm run login && pnpm build",
+    "release": "standard-version"
+  },
+  "keywords": [],
+  "author": "Zhuo FENG",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@skand/icons": "bitbucket:skandio/icons#v0.1.11",
+    "@skand/variables": "bitbucket:skandio/variables#v0.1.1",
+    "@types/ramda": "^0.29.9",
+    "commitizen": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^8.38.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.1",
+    "ramda": "^0.29.1",
+    "standard-version": "^9.5.0",
+    "typescript": "^5.0.2",
+    "unocss": "^0.53.1"
+  }
+}
