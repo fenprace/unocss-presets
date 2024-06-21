@@ -1,8 +1,7 @@
 import * as variables from '@skand/variables';
-import mergeDeepLeft from 'ramda/src/mergeDeepLeft';
 import { Preset } from 'unocss';
 
-export const themeBase = {
+export const theme = {
   colors: {
     alert: {
       100: variables.colorAlert100,
@@ -71,18 +70,11 @@ export const themeBase = {
   },
 };
 
-export type DeepPartial<T> = {
-  [P in keyof T]?: DeepPartial<T[P]>;
-};
-
 export interface PresetOptions {
   includeReset?: boolean;
-  themeOverrides?: DeepPartial<typeof themeBase>;
 }
 
-export const presetSkandBase = ({ includeReset, themeOverrides }: PresetOptions = {}): Preset => {
-  const theme = themeOverrides ? mergeDeepLeft(themeOverrides, themeBase) : themeBase;
-
+export const presetSkandBase = ({ includeReset }: PresetOptions = {}): Preset => {
   return {
     name: 'presetSkandBase',
     preflights: [
