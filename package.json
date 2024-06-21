@@ -4,6 +4,11 @@
   "description": "",
   "main": "index.js",
   "type": "module",
+  "files": [
+    "dist",
+    "CHANGELOG.md",
+    "README.md"
+  ],
   "scripts": {
     "build": "vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",

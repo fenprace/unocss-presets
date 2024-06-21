@@ -1,0 +1,80 @@
+name: Install, build and release
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ vars.CODEARTIFACT_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.CODEARTIFACT_SECRET_ACCESS_KEY }}
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+
+jobs:
+  install-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          cache: 'pnpm'
+          node-version: '18.x'
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      # - name: Test
+      #   run: pnpm test
+      - name: Build
+        run: pnpm build
+      - name: Compress
+        run: tar -czvf dist.tar.gz dist
+      - uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: ./dist.tar.gz
+
+  Release:
+    runs-on: ubuntu-latest
+    needs: install-build
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          cache: 'pnpm'
+          node-version: '18.x'
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist
+      - name: Decompress
+        run: |
+          tar -xzvf dist.tar.gz
+          rm -rf dist.tar.gz
+      - name: Release
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          pnpm release -a --no-verify -m "chore(release): [skip ci]"
+      - name: Install AWS CLI
+        run: sudo apt-get update && sudo apt-get install -y awscli
+      - name: Log in to CodeArtifact
+        run: pnpm run login
+      - name: Push
+        uses: ad-m/github-push-action@master
+        with:
+          branch: master
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tags: true
+      - name: Publish
+        run: pnpm publish --no-git-checks
